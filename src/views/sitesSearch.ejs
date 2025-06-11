@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Пошук сайтів</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .container {
+            background: rgba(255,255,255,0.97);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px #1976d2aa;
+            padding: 36px 32px 32px 32px;
+            max-width: 600px;
+            margin: 48px auto;
+            backdrop-filter: blur(2px);
+            animation: fadeIn 0.7s forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        h1 {
+            color: #1976d2;
+            text-align: center;
+            margin-bottom: 32px;
+            text-shadow: 0 2px 8px #1976d233;
+        }
+        form {
+            margin-bottom: 28px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-input {
+            flex:1;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #1976d2;
+            font-size: 17px;
+            background: #f5faff;
+            transition: border 0.2s;
+        }
+        .search-input:focus {
+            border: 2px solid #0d47a1;
+            outline: none;
+        }
+        .search-btn {
+            padding: 12px 22px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 17px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .search-btn:hover { background: #1565c0; }
+        .search-btn:active { transform: scale(0.97); }
+        .sites-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 18px 0;
+        }
+        .site-item {
+            background: linear-gradient(120deg, #e3f2fd 60%, #ffffff 100%);
+            border-radius: 10px;
+            margin-bottom: 14px;
+            padding: 16px 22px;
+            box-shadow: 0 2px 8px #1976d233;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: fadeIn 0.7s forwards;
+            opacity: 0;
+            animation-delay: 0.1s;
+        }
+        .site-domain {
+            font-weight: bold;
+            color: #1976d2;
+            font-size: 17px;
+        }
+        .site-visitors {
+            margin-left: 14px;
+            color: #444;
+            font-size: 15px;
+        }
+        .details-btn {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 7px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 15px;
+            margin-left: 18px;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .details-btn:hover { background: #1565c0; }
+        .details-btn:active { transform: scale(0.97); }
+        .not-found {
+            color: #c62828;
+            text-align: center;
+            font-size: 17px;
+            margin: 18px 0;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 18px;
+            background: #1976d2;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px #1976d233;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .back-link:hover {
+            background: #1565c0;
+            transform: scale(1.04);
+        }
+        @media (max-width: 700px) {
+            .container { padding: 18px 4vw; }
+            .site-item { flex-direction: column; align-items: flex-start; }
+            .details-btn { margin-left: 0; margin-top: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Пошук сайтів</h1>
+        <form method="get" action="/sites/search">
+            <input
+                type="text"
+                name="domain"
+                class="search-input"
+                placeholder="Введіть домен або його частину"
+                value="<%= domain || '' %>"
+                title="Пошук за доменом"
+            />
+            <select name="genre" class="search-input" style="max-width:180px;" title="Фільтр за жанром">
+                <option value="">Всі жанри</option>
+                <option value="NEWS" <%= genre === 'NEWS' ? 'selected' : '' %>>Новини</option>
+                <option value="ENTERTAINMENT" <%= genre === 'ENTERTAINMENT' ? 'selected' : '' %>>Розваги</option>
+                <option value="ECOMMERCE" <%= genre === 'ECOMMERCE' ? 'selected' : '' %>>Ecommerce</option>
+            </select>
+            <button type="submit" class="search-btn" title="Пошук">Шукати</button>
+        </form>
+        <ul class="sites-list">
+            <% if (typeof domain !== 'undefined' && domain && sites && sites.length === 0) { %>
+                <li class="not-found">Нічого не знайдено.</li>
+            <% } %>
+            <% sites.forEach(site => { %>
+                <li class="site-item">
+                    <div>
+                        <span class="site-domain"><%= site.domain %></span>
+                        <span class="site-visitors">Відвідувачів: <%= site.visitors %></span>
+                    </div>
+                    <a class="details-btn" href="/sites/<%= site.id %>" title="Деталі">Деталі</a>
+                </li>
+            <% }) %>
+        </ul>
+        <a class="back-link" href="/sites" title="Всі сайти">Всі сайти</a>
+    </div>
+</body>
+</html>

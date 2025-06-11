@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сайти</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .flash-message {
+            background: #388e3c;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            text-align: center;
+            font-size: 17px;
+            box-shadow: 0 2px 8px #1976d233;
+            animation: fadeIn 0.7s;
+        }
+        .nav-bar {
+            display: flex;
+            gap: 8px;
+            margin: 24px 0 0 32px;
+        }
+        .nav-btn {
+            display: inline-block;
+            background: #1976d2;
+            color: #fff;
+            padding: 7px 18px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 15px;
+            border: none;
+            margin-bottom: 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-btn:hover { background: #1565c0; }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 16px;
+        }
+        .add-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            background: #1976d2;
+            color: #fff;
+            padding: 8px 18px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .add-btn:hover { background: #1565c0; }
+        .sites-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+        .site-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px #1976d2aa;
+            padding: 24px;
+            width: 300px;
+            min-width: 260px;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: box-shadow 0.3s, transform 0.3s;
+            opacity: 0;
+            animation: fadeIn 0.7s forwards;
+        }
+        .site-card:hover {
+            box-shadow: 0 8px 32px #0d47a1cc;
+            transform: translateY(-8px) scale(1.03);
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .site-domain { font-weight: bold; color: #1976d2; font-size: 18px; margin-bottom: 8px; }
+        .site-visitors { margin-bottom: 12px; }
+        .site-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            width: 100%;
+        }
+        .details-btn,
+        .edit-btn,
+        .delete-btn {
+            flex: 1 1 0;
+            min-width: 0;
+            padding: 8px 0;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: background 0.2s, transform 0.1s;
+            box-sizing: border-box;
+            margin: 0;
+            display: inline-block;
+        }
+        .details-btn { background: #1976d2; }
+        .details-btn:hover { background: #1565c0; }
+        .edit-btn { background: #388e3c; }
+        .edit-btn:hover { background: #256029; }
+        .delete-btn { background: #c62828; }
+        .delete-btn:hover { background: #8b1c1c; }
+        .details-btn:active,
+        .edit-btn:active,
+        .delete-btn:active {
+            transform: scale(0.96);
+        }
+        .sort-form {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+        .sort-btn {
+            background: #388e3c;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 18px;
+            font-size: 15px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .sort-btn:hover { background: #256029; }
+        select {
+            padding: 7px 10px;
+            border-radius: 4px;
+            border: 1px solid #bbb;
+            font-size: 15px;
+            margin-right: 4px;
+        }
+        h1 {
+            color: #222;
+            text-align: center;
+            text-shadow: 0 2px 8px #1976d233;
+        }
+        @media (max-width: 700px) {
+            .main-content { padding: 0 2vw; }
+            .sites-list { flex-direction: column; align-items: center; }
+            .site-card { max-width: 98vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-bar">
+        <a href="/" class="nav-btn">Головна</a>
+        <a href="/sites/search" class="nav-btn">Пошук</a>
+        <% if (isAdmin) { %>
+            <a href="/logout" class="nav-btn" style="background:#c62828;">Вийти</a>
+        <% } else { %>
+            <a href="/login" class="nav-btn">Увійти як адміністратор</a>
+        <% } %>
+    </div>
+    <div class="main-content">
+        <% if (message) { %>
+            <div class="flash-message"><%= message %></div>
+        <% } %>
+        <h1>Список сайтів</h1>
+        <a href="/sites/new" class="add-btn">Додати сайт</a>
+        <div class="sites-list">
+            <% sites.forEach(site => { %>
+                <div class="site-card">
+                    <div class="site-domain"><%= site.domain %></div>
+                    <div class="site-visitors">Відвідувачів: <%= site.visitors %></div>
+                    <div class="site-actions">
+                        <a class="details-btn" href="/sites/<%= site.id %>" title="Деталі">Деталі</a>
+                        <% if (isAdmin) { %>
+                            <a class="edit-btn" href="/sites/<%= site.id %>/edit" title="Редагувати">Редагувати</a>
+                            <form action="/sites/<%= site.id %>/delete" method="POST" style="display:inline;flex:1;">
+                                <button class="delete-btn" onclick="return confirm('Видалити сайт?');" type="submit" title="Видалити">Видалити</button>
+                            </form>
+                        <% } %>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+        <form method="get" action="/sites" class="sort-form">
+            <select name="sort">
+                <option value="visitors" <%= sort === 'visitors' ? 'selected' : '' %>>За відвідувачами</option>
+                <option value="domain" <%= sort === 'domain' ? 'selected' : '' %>>За доменом</option>
+            </select>
+            <button type="submit" class="sort-btn">Сортувати</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Genre {
+  NEWS
+  ENTERTAINMENT
+  ECOMMERCE
+}
+
+model Site {
+  id          Int      @id @default(autoincrement())
+  domain      String   @unique
+  genre       Genre
+  visitors    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sessions    Session[]
+}
+
+model Session {
+  id          Int      @id @default(autoincrement())
+  siteId      Int
+  date        DateTime
+  views       Int
+  uniqueUsers Int
+
+  site        Site     @relation(fields: [siteId], references: [id])
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  password String
+  isAdmin  Boolean @default(false)
+}

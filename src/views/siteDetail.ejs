@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Деталі сайту</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px;
+            box-shadow: 0 4px 24px #1976d2aa;
+            padding: 32px;
+            max-width: 600px;
+            margin: 40px auto;
+            backdrop-filter: blur(2px);
+            animation: fadeIn 0.7s forwards;
+            opacity: 0;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        h1 { 
+            color: #1976d2; 
+            text-align: center;
+            text-shadow: 0 2px 8px #1976d233;
+        }
+        h2 {
+            color: #0d47a1;
+            margin-top: 32px;
+            text-shadow: 0 2px 8px #1976d233;
+        }
+        .sessions-list { margin-top: 20px; }
+        .session-item {
+            background: linear-gradient(120deg, #e3f2fd 60%, #ffffff 100%);
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px #1976d233;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+        .session-item:hover {
+            box-shadow: 0 6px 18px #0d47a1cc;
+            transform: translateY(-4px) scale(1.02);
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 24px;
+            background: #1976d2;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px #1976d233;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .back-link:hover {
+            background: #1565c0;
+            transform: scale(1.04);
+        }
+        .site-info {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #222;
+        }
+        .chart-block {
+            margin: 32px 0 0 0;
+            background: #f5faff;
+            border-radius: 12px;
+            padding: 18px 12px 8px 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Деталі сайту <%= site.domain %></h1>
+        <div class="site-info">Відвідувачів: <%= site.visitors %></div>
+        <div class="chart-block">
+            <h2>Графік переглядів</h2>
+            <canvas id="viewsChart" width="400" height="180"></canvas>
+        </div>
+        <h2>Сесії</h2>
+        <div class="sessions-list">
+            <% site.sessions.forEach(session => { %>
+                <div class="session-item">
+                    <div>Дата: <%= new Date(session.date).toLocaleString() %></div>
+                    <div>Переглядів: <%= session.views %></div>
+                    <div>Унікальних користувачів: <%= session.uniqueUsers %></div>
+                </div>
+            <% }) %>
+            <% if (!site.sessions.length) { %>
+                <div>Сесій ще немає.</div>
+            <% } %>
+        </div>
+        <a class="back-link" href="/sites" title="Повернутись до списку">Назад до списку</a>
+    </div>
+    <script>
+        const sessions = <%- JSON.stringify(site.sessions) %>;
+        const labels = sessions.map(s => new Date(s.date).toLocaleDateString());
+        const views = sessions.map(s => s.views);
+
+        new Chart(document.getElementById('viewsChart'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{
+                    label: 'Перегляди',
+                    data: views,
+                    borderColor: '#1976d2',
+                    backgroundColor: 'rgba(25, 118, 210, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } }
+            }
+        });
+    </script>
+</body>
+</html>

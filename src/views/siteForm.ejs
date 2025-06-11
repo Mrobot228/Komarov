@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= site ? 'Редагувати сайт' : 'Додати сайт' %></title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0d47a1, #1976d2, #42a5f5, #ffffff);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+        .container {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #bbb;
+            padding: 32px;
+            max-width: 500px;
+            margin: 40px auto;
+        }
+        label { display: block; margin-top: 12px; }
+        input, select { width: 100%; padding: 8px; margin-top: 4px; }
+        button {
+            margin-top: 20px;
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover { background: #1565c0; }
+        .session-form {
+            background: #f3f3f3;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+        }
+        .session-form label { margin-top: 6px; }
+        .session-form button {
+            margin-top: 10px;
+            background: #388e3c;
+        }
+        .session-form button:hover {
+            background: #256029;
+        }
+        .delete-btn {
+            background:#c62828;
+            margin-top:10px;
+        }
+        .delete-btn:hover {
+            background:#8b1c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><%= site ? 'Редагувати сайт' : 'Додати сайт' %></h1>
+        <form action="<%= action %>" method="<%= method %>">
+            <label>Домен:
+                <input type="text" name="domain" value="<%= site ? site.domain : '' %>" required>
+            </label>
+            <label>Жанр:
+                <select name="genre" required>
+                    <option value="NEWS" <%= site && site.genre === 'NEWS' ? 'selected' : '' %>>Новини</option>
+                    <option value="ENTERTAINMENT" <%= site && site.genre === 'ENTERTAINMENT' ? 'selected' : '' %>>Розваги</option>
+                    <option value="ECOMMERCE" <%= site && site.genre === 'ECOMMERCE' ? 'selected' : '' %>>Ecommerce</option>
+                </select>
+            </label>
+            <label>Відвідувачі:
+                <input type="number" name="visitors" value="<%= site ? site.visitors : '' %>" required>
+            </label>
+            <% if (!site) { %>
+                <label>Дата першої сесії:
+                    <input type="datetime-local" name="sessionDate" required>
+                </label>
+                <label>Переглядів (перша сесія):
+                    <input type="number" name="sessionViews" required>
+                </label>
+                <label>Унікальних користувачів (перша сесія):
+                    <input type="number" name="sessionUniqueUsers" required>
+                </label>
+            <% } %>
+            <button type="submit"><%= site ? 'Оновити' : 'Додати' %></button>
+        </form>
+
+        <% if (site && site.sessions && site.sessions.length > 0) { %>
+            <h2 style="margin-top:32px;">Сесії сайту</h2>
+            <% site.sessions.forEach(session => { %>
+                <form class="session-form" action="/sessions/<%= session.id %>?_method=PUT" method="POST">
+                    <label>Дата:
+                        <input type="datetime-local" name="date" value="<%= session.date.toISOString().slice(0,16) %>" required>
+                    </label>
+                    <label>Переглядів:
+                        <input type="number" name="views" value="<%= session.views %>" required>
+                    </label>
+                    <label>Унікальних користувачів:
+                        <input type="number" name="uniqueUsers" value="<%= session.uniqueUsers %>" required>
+                    </label>
+                    <button type="submit">Оновити сесію</button>
+                </form>
+                <form action="/sessions/<%= session.id %>/delete" method="POST" onsubmit="return confirm('Видалити цю сесію?');" style="margin-bottom:16px;">
+                    <button type="submit" class="delete-btn">Видалити сесію</button>
+                </form>
+            <% }) %>
+        <% } %>
+
+        <% if (site) { %>
+            <h3>Додати нову сесію</h3>
+            <form class="session-form" action="/sessions" method="POST">
+                <input type="hidden" name="siteId" value="<%= site.id %>">
+                <label>Дата:
+                    <input type="datetime-local" name="date" required>
+                </label>
+                <label>Переглядів:
+                    <input type="number" name="views" required>
+                </label>
+                <label>Унікальних користувачів:
+                    <input type="number" name="uniqueUsers" required>
+                </label>
+                <button type="submit">Додати сесію</button>
+            </form>
+            <form action="/sites/<%= site.id %>/delete" method="POST" onsubmit="return confirm('Видалити сайт?');">
+                <button type="submit" class="delete-btn">Видалити</button>
+            </form>
+        <% } %>
+        <div style="margin-top:20px;">
+            <a href="/sites">Назад до списку</a>
+        </div>
+    </div>
+</body>
+</html>
